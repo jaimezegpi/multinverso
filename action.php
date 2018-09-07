@@ -16,14 +16,9 @@ if ( isset( $_GET['user_data'] ) ){
 }else{ exit(2); }
 /*------------USER DATA----------- END*/
 
-
-
-
 if( !isset( $_SESSION['player_id'] ) ){
 	$_SESSION['player_id'] = session_id();
 }
-
-
 
 if ( !file_exists('server_population.dat') ){
 	$server_population = fopen( "server_population.dat", "w" );
@@ -33,39 +28,40 @@ if ( !file_exists('server_population.dat') ){
 	$server_population = file_get_contents( "server_population.dat" );
 }
 
-
 $server_population_clients = explode("|", $server_population);
 
-
-
-
-if ( count($server_population_clients)<1 ){
-	$t=time();
+if ( count($server_population_clients)<1 || $server_population=='' ){
+	$t = strtotime( Date('Y-m-d H:i:s') );
 	$server_population = fopen( "server_population.dat", "w+" );
-	fwrite($server_population, $_SESSION['player_id'].";".date("Y-m-d",$t).";".$user_data);
+	fwrite($server_population, $_SESSION['player_id'].";".$t.";".$user_data);
 	fclose( $server_population );
 	exit();
 }elseif( count($server_population_clients)>=1 ){
-	$t=time();
+	$t = strtotime( Date('Y-m-d H:i:s') );
 	$return_data = "";
 	$user_detector = false;
 	foreach ( $server_population_clients as $key => $client ) {
-		echo "X";
 		$client_data = explode(";", $client);
-		if ( $key>0 ){
+		if (isset($client_data[1])){
+			$client_pause_time = $t-$client_data[1];
+			echo $client_pause_time;
+			if ($client_pause_time>50){ continue; }
+		}else{ continue; }
+
+		if ( $key>0 && isset($client_data[1]) ){
 			$return_data.="|";
 		}
 
 		if ($_SESSION['player_id'] == $client_data[0]){
 			$user_detector = true;
-			$return_data.=$_SESSION['player_id'].";".date("Y-m-d",$t).";".$user_data;
+			$return_data.=$_SESSION['player_id'].";".$t.";".$user_data;
 		}else{
 			$return_data.=$client;
 		}
 
 	}
-	if (!$user_detector){
-		$return_data.="|".$_SESSION['player_id'].";".date("Y-m-d",$t).";".$user_data;
+	if (!$user_detector && isset($client_data[1]) ){
+		$return_data.="|".$_SESSION['player_id'].";".$t.";".$user_data;
 	}
 	$server_population = fopen( "server_population.dat", "w+" );
 	fwrite($server_population, $return_data);
