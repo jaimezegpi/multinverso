@@ -1,2 +1,0 @@
-# multinverso
-Multiplayer Coppercube

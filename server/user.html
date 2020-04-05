@@ -1,0 +1,43 @@
+<script type="text/javascript">
+
+function ajaxRunner(action,func){
+	var func = func;
+	var xhttp = new XMLHttpRequest();
+	xhttp.responsetype = "json";
+	xhttp.onreadystatechange = function() {
+	    if (this.readyState == 4 && this.status == 200) {
+	        var response = xhttp.responseText;
+	        window[func](response);
+	    }
+	};
+	xhttp.open("GET", "http://localhost/laboratorio/comet/server.php?action="+action, true);
+	xhttp.send();
+}
+
+ajaxRunner("get_id","getPlayerID");
+function getPlayerID( ID ){
+	var user_id = JSON.parse(ID);
+	console.log(user_id.id);
+	window.user_id = user_id.id;
+}
+
+ajaxRunner("get_map_users","getMapUsers");
+function getMapUsers( map_users ){
+	var users = JSON.parse(map_users);
+	for ( i=0; i<users.length; i++ ){
+		if ( users[i].u !== window.user_id ){
+			console.log("---"+users[i].u);
+		}
+	}
+}
+
+
+var update_user = "&position=666,999,33&rotation=66,66,66"
+ajaxRunner("update_user"+update_user,"updateUser");
+function updateUser( r ){
+	console.log( r );
+}
+
+
+
+</script>

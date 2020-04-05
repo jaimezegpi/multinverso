@@ -1,4 +1,0 @@
-<IfModule mod_headers.c>
-    Header set Access-Control-Allow-Origin http://www.vknyvz.com  
-    Header set Access-Control-Allow-Credentials true
-</IfModule>
